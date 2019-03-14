@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/main.c
+printf.h
+/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/printf.h
+
+/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/printf.c
+stdarg.h
+-
+lzma.h
+-
+unistd.h
+-
+malloc.h
+-
+printf.h
+/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/printf.h
+
+/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/printf.h
+stdarg.h
+-
+lzma.h
+-
+
