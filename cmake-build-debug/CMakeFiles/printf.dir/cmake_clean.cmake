@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/printf.dir/main.c.o"
   "CMakeFiles/printf.dir/printf.c.o"
+  "CMakeFiles/printf.dir/toString.c.o"
+  "CMakeFiles/printf.dir/my_parser.c.o"
   "printf.pdb"
   "printf"
 )

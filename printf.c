@@ -3,28 +3,44 @@
 //
 #include <stdarg.h>
 #include <lzma.h>
-#include <unistd.h>
+#include <zconf.h>
 #include <malloc.h>
 #include "printf.h"
+#include "toString.h"
+#include "my_parser.h"
 
+void UpdateList(list **curlp, char *cur, size_t length, VarSetting *var);
+list *CreateList(char *s, size_t *argc);
+void FreeList(list *l);
+void ConvertToString(char *s, char *end, va_list variadic, VarSetting *var);
 
+// params :
+// *s : string of given text
+// ... : variables to define in the given string
 void my_printf(char *s, ...)
 {
     size_t argc = 0;
     list *l = CreateList(s, &argc);
+    list * ref = l;
     va_list variadic;
-    va_start(variadic, argc);
+    va_start(variadic, s);
     while(l)
     {
-        if(!l->isText)
-            ConvertToString(l->start, l->end, variadic);
+        if(l->var)
+            ConvertToString(l->start, l->end, variadic, l->var);
         else
             write(STDOUT_FILENO, l->start, (l->end+1-l->start));
         l = l->next;
     }
     va_end(variadic);
+    FreeList(ref);
 }
 
+
+// params :
+// *s : begin of text to convert
+// *argc : pointer to number counting the requested arguments
+// return : pointer to created list
 list *CreateList(char *s, size_t *argc)
 {
     list *l = calloc(sizeof(list), 1);
@@ -33,13 +49,14 @@ list *CreateList(char *s, size_t *argc)
     char *cur = s;
     for (; *cur; ++cur)
     {
-        if(*cur == '%')
+        if(*cur == '%' && *(cur+1) && *(cur+1) != '%')
         {
-            size_t length;
-            if((length = IsPrintableCharacter(cur+1)) != 0)
+            VarSetting *var = NULL;
+            size_t length2 = ReadData(cur+1, &var);
+            if(length2 != 0)
             {
-                UpdateList(&curl, cur, length);
-                cur+=length;
+                UpdateList(&curl, cur, length2, var);
+                cur += length2;
                 (*argc)++;
             }
         }
@@ -48,18 +65,26 @@ list *CreateList(char *s, size_t *argc)
     return l;
 }
 
-void UpdateList(list **curl, char *cur, size_t length)
+// params :
+// **curl : pointer to pointer of current list
+// *cur : crrent character analysed
+// length : length of the new buffer to create
+// *var : settings to save
+void UpdateList(list **curl, char *cur, size_t length, VarSetting *var)
 {
+    //if current buffer is not untoched, close it
     if((*curl)->start != cur)
     {
-        (*curl)->isText = 1;
         (*curl)->end=cur-1;
         (*curl)->next=calloc(sizeof(list), 1);
         *curl = (*curl)->next;
         (*curl)->start=cur;
     }
+    //close buffer
     (*curl)->end=cur+length;
-    if(*(cur+length+1)!='\0')
+    (*curl)->var = var;
+    //open new buffer only if end not reached
+    if(*(cur+length+1) != '\0')
     {
         (*curl)->next = calloc(sizeof(list), 1);
         *curl = (*curl)->next;
@@ -67,63 +92,78 @@ void UpdateList(list **curl, char *cur, size_t length)
     }
 }
 
-size_t IsPrintableCharacter(char *s)
+// param : list to free and eventually free its element
+void FreeList(list *l)
 {
-    if(*s == '\0')
-        return 0;
-    char c = *s;
-    switch(c)
+    list * cur = l;
+    while(cur)
     {
-        case 'd':
-        case 'i':
-        case 'o':
-        case 'x':
-        case 'X':
-        case 'u':
-        case 'c':
-        case 's':
-        case 'f':
-        case 'e':
-        case 'E':
-        case 'g':
-        case 'G':
-        case 'p':
-            return 1;
+        l = cur->next;
+        if(cur->var)
+            FreeVarSetting(cur->var);
+        free(cur);
+        cur = l;
+    }
+}
+
+
+// params:
+// *s : begin of string to convert
+// *end : end of string to convert
+// variadic : current variadic element
+// *var : pointer to variable settings
+void ConvertToString(char *s, char *end, va_list variadic, VarSetting *var)
+{
+    while(!IsLetter(*(s+1)))
+        s++;
+    size_t length = end + 1 - s;
+    switch (*(s+1))
+    {
         case 'l':
-            if(*(s+1))
+            if(length >= 2)
             {
-                switch (*(s+1))
-                {
-                    case 'u':
-                    case 'd':
-                    case 'f':
-                        return 2;
-                    default:
-                        break;
-                }
+                if (*(s + 2) == 'u')
+                    // unsigned long
+                else if (*(s + 2) == 'd')
+                    // long
+                else if (*(s + 2) == 'f')
+                    // double
             }
+            else
+                goto DEFAULT;
+            break;
+        case 'i':
+        case 'd':
+            // int
+            break;
+        case 's':
+            // char*
+            break;
+        case 'c':
+            // int
+            break;
+        case 'f':
+            // double
+            break;
         default:
-            return 0;
+            DEFAULT:
+            //should not happen
+            va_arg(variadic, double);
+            write(STDOUT_FILENO, "?", 1);
+            break;
     }
-
 }
-
-void printString(list *l)
-{
-    for (char *s = l->start; s <= l->end; ++s)
-    {
-        printf("%c", *s);
-    }
-    printf("\n");
-    printf("%s\n\n", ((l->isText)?"isText":"isVar"));
-}
-
-void ConvertToString(char *s, char *end, va_list variadic)
+// params:
+// *s : begin of string to convert
+// *end : end of string to convert
+// variadic : current variadic element
+void ConvertToStringOld(char *s, char *end, va_list variadic)
 {
     size_t length = end + 1 - s;
     char string[100] = {0};
     size_t count = 0;
-    int precision = 6;
+    while(!IsLetter(*(s+1)))
+        s++;
     switch (*(s+1))
     {
         case 'l':
@@ -134,7 +174,7 @@ void ConvertToString(char *s, char *end, va_list variadic)
                 else if (*(s + 2) == 'd')
                     count = SignedToString(va_arg(variadic, long), string);
                 else if (*(s + 2) == 'f')
-                    count = DoubleToString(va_arg(variadic, double), precision, string);
+                    count = DoubleToString(va_arg(variadic, double), DEFAULT_PRECISION, string);
                 else
                 {
                     va_arg(variadic, double);
@@ -153,7 +193,7 @@ void ConvertToString(char *s, char *end, va_list variadic)
             PrintChar(va_arg(variadic, int));
             break;
         case 'f':
-            count = DoubleToString(va_arg(variadic, double), precision, string);
+            count = DoubleToString(va_arg(variadic, double), DEFAULT_PRECISION, string);
             break;
         default:
             //should not happen
@@ -165,70 +205,28 @@ void ConvertToString(char *s, char *end, va_list variadic)
         write(STDOUT_FILENO, string, count);
 }
 
-size_t SignedToString(long long n, char s[])
+
+
+#ifdef MY_PRINTF_DEB
+// all debugging functions here
+
+void printList(list *l)
 {
-    if(n < 0)
+    for(;l;l=l->next)
+        printString(l);
+}
+
+void printString(list *l)
+{
+    for (char *s = l->start; s <= l->end; ++s)
     {
-        char minus[1] = {'-'};
-        write(STDOUT_FILENO, minus, 1);
-        n*=-1;
+        if(*s == ' ')
+            printf("_");
+        else
+            printf("%c", *s);
     }
-    return UnsignedToString((unsigned long)n, s);
+    printf("\n");
+    printf("%s\n\n", ((l->var == NULL)?"isText":"isVar"));
 }
 
-size_t UnsignedToString(unsigned long n, char s[])
-{
-    int maxSize = 32;
-    int pos=maxSize-1;
-    for(; n>0; --pos, n/=10)
-        s[pos] = (char)('0' + n%10);
-    size_t i = 0;
-    for (; pos + 1 < maxSize; ++pos, ++i)
-    {
-        s[i] = s[pos+1];
-        s[pos+1] = '\0';
-    }
-    if(i == 0)
-        s[i++] = '0';
-    return i;
-}
-
-size_t DoubleToString(double n, int precision, char s[])
-{
-    long long integerPart = (long long)n;
-    long precisionFactor = 1;
-    while (precision-- > 0)
-        precisionFactor*=10;
-    long long decimalPart = (long long)(n - integerPart) * precisionFactor;
-    if(decimalPart<0)
-        decimalPart*=-1;
-    while(decimalPart%10 == 0 && decimalPart != 0)
-        decimalPart/=10;
-    char decimalP[32] = {0};
-    size_t lengthI = SignedToString(integerPart, s);
-    size_t lengthD = UnsignedToString((unsigned long)decimalPart, decimalP);
-    s[lengthI] = '.';
-    for (size_t i = lengthI + 1; i < (lengthI + lengthD + 1); ++i)
-    {
-        s[i] = decimalP[i - lengthI - 1];
-    }
-    return lengthD + lengthI + 1;
-}
-
-void PrintChar(int c)
-{
-    if(c > 255)
-        return;
-    char cara = (char)c;
-    char carac[1] = {cara};
-    write(STDOUT_FILENO, carac, 1);
-}
-
-void PrintString(char *s)
-{
-    char *string = s;
-    size_t count = 0;
-    while(*(string+count) != '\0')
-        count++;
-    write(STDOUT_FILENO, s, count);
-}
+#endif

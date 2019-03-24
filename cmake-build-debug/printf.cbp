@@ -81,10 +81,22 @@
 		<Unit filename="/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/main.c">
 			<Option target="printf"/>
 		</Unit>
+		<Unit filename="/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/my_parser.c">
+			<Option target="printf"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/my_parser.h">
+			<Option target="printf"/>
+		</Unit>
 		<Unit filename="/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/printf.c">
 			<Option target="printf"/>
 		</Unit>
 		<Unit filename="/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/printf.h">
+			<Option target="printf"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/toString.c">
+			<Option target="printf"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/toString.h">
 			<Option target="printf"/>
 		</Unit>
 		<Unit filename="/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/CMakeLists.txt">

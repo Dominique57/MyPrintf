@@ -3,28 +3,32 @@
 //
 #ifndef PRINTF_H
 #define PRINTF_H
+
+#define MY_PRINTF_DEB
+#define DEFAULT_PRECISION 6
+
 #include <stdarg.h>
 #include <lzma.h>
+#include "toString.h"
+#include "my_parser.h"
+
 
 typedef struct list list;
 struct list {
     list *next;
     char *start;
     char *end;
-    char isText;
+    VarSetting *var;
 };
 
-
 void my_printf(char *s, ...);
-size_t IsPrintableCharacter(char *s);
-list *CreateList(char *s, size_t *argc);
+
+
+
+#ifdef MY_PRINTF_DEB
+// all debugging functions here
+void printList(list *l);
 void printString(list *l);
-void UpdateList(list **curlp, char *cur, size_t length);
-void ConvertToString(char *s, char *end, va_list variadic);
-size_t UnsignedToString(unsigned long n, char s[]);
-size_t SignedToString(long long n, char s[]);
-void PrintChar(int c);
-void PrintString(char *s);
-size_t DoubleToString(double n, int precision, char s[]);
+#endif
 
 #endif //PRINTF_H

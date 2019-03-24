@@ -150,6 +150,33 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/printf.dir/build.make CMakeFiles/printf.dir/main.c.s
 .PHONY : main.c.s
 
+my_parser.o: my_parser.c.o
+
+.PHONY : my_parser.o
+
+# target to build an object file
+my_parser.c.o:
+	$(MAKE) -f CMakeFiles/printf.dir/build.make CMakeFiles/printf.dir/my_parser.c.o
+.PHONY : my_parser.c.o
+
+my_parser.i: my_parser.c.i
+
+.PHONY : my_parser.i
+
+# target to preprocess a source file
+my_parser.c.i:
+	$(MAKE) -f CMakeFiles/printf.dir/build.make CMakeFiles/printf.dir/my_parser.c.i
+.PHONY : my_parser.c.i
+
+my_parser.s: my_parser.c.s
+
+.PHONY : my_parser.s
+
+# target to generate assembly for a file
+my_parser.c.s:
+	$(MAKE) -f CMakeFiles/printf.dir/build.make CMakeFiles/printf.dir/my_parser.c.s
+.PHONY : my_parser.c.s
+
 printf.o: printf.c.o
 
 .PHONY : printf.o
@@ -177,6 +204,33 @@ printf.c.s:
 	$(MAKE) -f CMakeFiles/printf.dir/build.make CMakeFiles/printf.dir/printf.c.s
 .PHONY : printf.c.s
 
+toString.o: toString.c.o
+
+.PHONY : toString.o
+
+# target to build an object file
+toString.c.o:
+	$(MAKE) -f CMakeFiles/printf.dir/build.make CMakeFiles/printf.dir/toString.c.o
+.PHONY : toString.c.o
+
+toString.i: toString.c.i
+
+.PHONY : toString.i
+
+# target to preprocess a source file
+toString.c.i:
+	$(MAKE) -f CMakeFiles/printf.dir/build.make CMakeFiles/printf.dir/toString.c.i
+.PHONY : toString.c.i
+
+toString.s: toString.c.s
+
+.PHONY : toString.s
+
+# target to generate assembly for a file
+toString.c.s:
+	$(MAKE) -f CMakeFiles/printf.dir/build.make CMakeFiles/printf.dir/toString.c.s
+.PHONY : toString.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -189,9 +243,15 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... my_parser.o"
+	@echo "... my_parser.i"
+	@echo "... my_parser.s"
 	@echo "... printf.o"
 	@echo "... printf.i"
 	@echo "... printf.s"
+	@echo "... toString.o"
+	@echo "... toString.i"
+	@echo "... toString.s"
 .PHONY : help
 
 
