@@ -5,6 +5,7 @@
 #define PRINTF_H
 
 #define MY_PRINTF_DEB
+#define DEFAULT_PRECISION 6
 
 #include <stdarg.h>
 #include <lzma.h>
@@ -16,12 +17,12 @@ typedef struct list list;
 struct list {
     list *next;
     char *start;
-    size_t length;
-    char toFree;
+    char *end;
+    VarSetting *var;
 };
 
 void my_printf(char *s, ...);
-list *InitList();
+
 
 
 #ifdef MY_PRINTF_DEB
