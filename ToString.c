@@ -42,6 +42,8 @@ char IsSign(char c)
     return c == '-' || c == '+';
 }
 
+// param : character to analyse
+// return : true if is even, else false
 char IsEven(long n)
 {
     return n % 2 == 0;
@@ -263,11 +265,13 @@ void UlongToStr(va_list variadic, VarSetting *var, my_string *str)
     str->toFree = 1;
 }
 
+// done
 void FloatToStr(va_list variadic, VarSetting *var, my_string *str)
 {
     DoubleToStr(variadic, var, str);
 }
 
+// done
 void DoubleToStr(va_list variadic, VarSetting *var, my_string *str)
 {
     char **result = &(str->s);
@@ -276,7 +280,6 @@ void DoubleToStr(va_list variadic, VarSetting *var, my_string *str)
     str->toFree = 1;
 }
 
-// done
 void StringToStr(va_list variadic, VarSetting *var, my_string *str)
 {
     // TODO (set var setting)
