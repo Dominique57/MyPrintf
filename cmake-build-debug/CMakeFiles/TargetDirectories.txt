@@ -1,3 +1,0 @@
-/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/cmake-build-debug/CMakeFiles/printf.dir
-/mnt/c/Users/domin/Desktop/fichier_prog/hgit/printf/cmake-build-debug/CMakeFiles/edit_cache.dir
