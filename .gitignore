@@ -35,3 +35,7 @@
 cmake-build-debug/*
 CMakeLists.txt
 main
+src/.idea/*
+src/cmake-build-debug/*
+src/CMakeLists.txt
+src/main
