@@ -1,2 +1,2 @@
 # printf
-Recoding printf at low level (not custom malloc)
+Recoding a printf function that support basic features such as variable formating
